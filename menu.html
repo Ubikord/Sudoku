@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./menu.css">
+    <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <div class = "Sudoku" >Sudoku</div>
+    <div class = "dif">Выберите уровень сложности</div>  
+  </div>
+  <div id="menu">
+        <button class="level-button" id="easyBtn" >Level 1</button>
+        <button class="level-button" id="mediumBtn" >Level 2</button>
+        <button class="level-button" id="hardBtn" >Level 3</button>
+        <button class="level-button" id="KillerBtn" >Killer Sudoku</button>
+        <script>
+            document.getElementById('easyBtn').addEventListener('click', function() {
+              localStorage.setItem('difficulty', '20');
+              window.location.href = 'index.html';
+            });
+        
+            document.getElementById('mediumBtn').addEventListener('click', function() {
+              localStorage.setItem('difficulty', '40');
+              window.location.href = 'index.html';
+            });
+        
+            document.getElementById('hardBtn').addEventListener('click', function() {
+              localStorage.setItem('difficulty', '60');
+              window.location.href = 'index.html';
+            });
+            document.getElementById('KillerBtn').addEventListener('click', function() {
+              localStorage.setItem('difficulty', '40');
+              window.location.href = 'index2.html';
+            });
+          </script>
+    </div>  
+</body>
+</html>
