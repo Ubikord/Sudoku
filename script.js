@@ -136,11 +136,27 @@ function setValueInSelectedCell(value) {
 
 function updateGameResult() {
   const gameResultElement = document.getElementById('game-result');
+  const gameOverMessage = document.getElementById("gameOver");
   errors++;
   if (errors >= 3) {
-    gameResultElement.textContent = 'Вы проиграли!';
-    gameResultElement.style.color = 'red';
-    errors = 0;
+    gameOverMessage.style.display = "block"; // Показать сообщение
+    gameOverMessage.style.position = "fixed"; // Зафиксировать на экране
+    gameOverMessage.style.top = "0";
+    gameOverMessage.style.left = "0";
+    gameOverMessage.style.width = "100%";
+    gameOverMessage.style.height = "100%";
+    gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.5)"; // Непрозрачный фон
+    gameOverMessage.style.color = "white";
+    gameOverMessage.style.textAlign = "center";
+    gameOverMessage.style.fontSize = "3em";
+    gameOverMessage.style.lineHeight = "1.5";
+    gameOverMessage.style.padding = "300px 0";
+    gameOverMessage.style.zIndex = "100";
+    gameResultElement.textContent = `Ошибок: ${errors}`;
+    gameResultElement.style.color = 'black';
+    setTimeout(() => {
+      window.location.href = 'menu.html';
+    }, 3000);
   } else {
     gameResultElement.textContent = `Ошибок: ${errors}`;
     gameResultElement.style.color = 'black';

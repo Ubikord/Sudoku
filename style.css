@@ -41,9 +41,8 @@ body {
 
 .wrap {
     display: flex;
-    grid-template-columns: 1fr 2fr;
-    grid-gap: 5px;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .grid {
@@ -163,13 +162,7 @@ body {
 }
 
 .left-column {
-    flex: 0 0 150px;
+    flex: 0 0 80px;
     text-align: left;
-    margin-right: 5px;
-}
-
-.grid-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-right: 50px;
 }
