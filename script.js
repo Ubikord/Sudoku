@@ -11,6 +11,7 @@ init();
 
 function init() {
   initCells();
+  initCellsSum();
   initNumbers();
   initRemover();
   initPrompter();
@@ -23,6 +24,11 @@ function initCells() {
   initCellsEvent();
 }
 
+function initCellsSum() {
+  cells = document.querySelectorAll('.cell');
+  fillCellsSum(0);
+}
+
 function fillCells() {
   for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
     const { row, column } = convertIndexToPosition(i);
@@ -31,6 +37,60 @@ function fillCells() {
       cells[i].classList.add('filled');
       cells[i].innerHTML = sudoku.grid[row][column];
     }
+  }
+}
+
+function fillCellsSum(index){
+  const { row, column } = convertIndexToPosition(index);
+  for (row = 0; row < GRID_SIZE; row++) {
+    for (column = 0; column < GRID_SIZE; column++) {
+    
+
+    if (storedSudokuToCompare[row][column].classList.contains('ingroup', 'notingroup')){
+      return fillCellsSum(index++);
+    }
+    let cellsInGroup = getRandomInt(3);
+    joinGroup(cellsInGroup);
+  }
+}
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max) + 2;
+}
+
+function joinGroup(cellsInGroup){
+  const directions = [
+    [row - 1, col], // вверх
+    [row + 1, col], // вниз
+    [row, col - 1], // влево
+    [row, col + 1] // вправо
+  ];
+  let randomDirection;
+  let newRow, newCol;
+  let foundDirection = false;
+  do {
+    randomDirection = Math.floor(Math.random() * directions.length);
+    [newRow, newCol] = directions[randomDirection];
+  
+    if (newRow < 0 || newRow >= GRID_SIZE || newCol < 0 || newCol >= GRID_SIZE 
+      || storedSudokuToCompare[newRow][newCol].classList.contains('ingroup', 'notingroup')) {
+      directions[randomDirection] = null;
+    }
+    else {
+      foundDirection = true;
+      break;
+    }
+  } while (directions[randomDirection] === null);
+    
+  if (foundDirection) {
+    storedSudokuToCompare[row][col].classList.add('ingroup');
+    storedSudokuToCompare[newRow][newCol].classList.add('ingroup');
+    
+    return joinGroup(cellsInGroup--, newRow, newCol);
+  } else {
+    storedSudokuToCompare[row][col].classList.add('notingroup');
+    return [row, col];
   }
 }
 
@@ -52,11 +112,6 @@ function onCellClick(clickedCell, index) {
     clickedCell.classList.add('selected');
     highlightCellsBy(index);
   }
-
-  if (clickedCell.innerHTML === '') return;
-  cells.forEach(cell => {
-    if (cell.innerHTML === clickedCell.innerHTML) cell.classList.add('selected');
-  });
 }
 
 function highlightCellsBy(index) {
@@ -222,4 +277,7 @@ function winAnimation() {
   for (let i = 1; i < 8; i++) {
     setTimeout(() => cells.forEach(cell => cell.classList.toggle('highlighted')), 500 + cells.length * 15 + 300 * i);
   }
+  setTimeout(() => {
+    window.location.href = 'menu.html';
+  }, 5000);
 }
