@@ -5,6 +5,7 @@ const storedSudokuToCompare = JSON.parse(localStorage.getItem('sudokuToCompare')
 console.table(storedSudokuToCompare);
 let errors = 0;
 let cells;
+let cellsSum;
 let selectedCellIndex;
 let selectedCell;
 init();
@@ -25,8 +26,9 @@ function initCells() {
 }
 
 function initCellsSum() {
-  cells = document.querySelectorAll('.cell');
-  fillCellsSum(0);
+  cellsSum = document.querySelectorAll('.cellsum');
+  let i = 0;
+  fillCellsSum(i);
 }
 
 function fillCells() {
@@ -40,57 +42,80 @@ function fillCells() {
   }
 }
 
-function fillCellsSum(index){
-  const { row, column } = convertIndexToPosition(index);
-  for (row = 0; row < GRID_SIZE; row++) {
-    for (column = 0; column < GRID_SIZE; column++) {
-    
-
-    if (storedSudokuToCompare[row][column].classList.contains('ingroup', 'notingroup')){
-      return fillCellsSum(index++);
+function fillCellsSum(i){
+  for (i; i < GRID_SIZE * GRID_SIZE; i++) {
+    console.log(cellsSum[i].classList.contains('ingroup', 'notingroup'), 'index = ', i)
+    if (cellsSum[i].classList.contains('ingroup', 'notingroup')){
+      return fillCellsSum(++i);
     }
-    let cellsInGroup = getRandomInt(3);
-    joinGroup(cellsInGroup);
+    let cellsInGroup = getRandomInt(2);
+    console.log ('#', cellsInGroup)
+    //const { row, column } = convertIndexToPosition(index);
+    joinGroup(cellsInGroup, i);
   }
 }
-}
+
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max) + 2;
 }
 
-function joinGroup(cellsInGroup){
+function joinGroup(cellsInGroup, index){
+  let newindex;
+  const { row, column } = convertIndexToPosition(index);
+  console.log(row, column)
   const directions = [
-    [row - 1, col], // вверх
-    [row + 1, col], // вниз
-    [row, col - 1], // влево
-    [row, col + 1] // вправо
+    [row - 1, column], // вверх
+    [row + 1, column], // вниз
+    [row, column - 1], // влево
+    [row, column + 1] // вправо
   ];
   let randomDirection;
   let newRow, newCol;
   let foundDirection = false;
+  if(cellsInGroup > 0 ){
+  cellsInGroup --;
   do {
     randomDirection = Math.floor(Math.random() * directions.length);
+    if (directions[randomDirection] == null){           
+      continue;
+    }
     [newRow, newCol] = directions[randomDirection];
-  
+
+    console.log('R C',newRow, newCol)
+
+    newindex = convertPositionToIndex(newRow, newCol);
+
+   console.log('newindex = ', newindex)
+   console.log('cellsSum = ',cellsSum[newindex])
+   console.log(newRow < 0 || newRow >= GRID_SIZE || newCol < 0 || newCol >= GRID_SIZE 
+    || cellsSum[newindex].classList.contains('ingroup', 'notingroup'))
+
+
     if (newRow < 0 || newRow >= GRID_SIZE || newCol < 0 || newCol >= GRID_SIZE 
-      || storedSudokuToCompare[newRow][newCol].classList.contains('ingroup', 'notingroup')) {
+      || cellsSum[newindex].classList.contains('ingroup', 'notingroup')) {
       directions[randomDirection] = null;
     }
     else {
       foundDirection = true;
       break;
     }
-  } while (directions[randomDirection] === null);
-    
+  } while (!directions.every(dir => dir === null));       
+  console.log('found = ',foundDirection)
   if (foundDirection) {
-    storedSudokuToCompare[row][col].classList.add('ingroup');
-    storedSudokuToCompare[newRow][newCol].classList.add('ingroup');
-    
-    return joinGroup(cellsInGroup--, newRow, newCol);
+    cellsSum[index].classList.add('ingroup');
+    cellsSum[newindex].classList.add('ingroup');
+    cellsSum[index].style.backgroundColor = 'red';
+    cellsSum[newindex].style.backgroundColor = 'red';
+    return joinGroup(--cellsInGroup,newindex);
   } else {
-    storedSudokuToCompare[row][col].classList.add('notingroup');
-    return [row, col];
+    console.log('ХУУУУУУУУУУУУУУУУУЙ')
+    cellsSum[index].classList.add('notingroup');
+  } 
+}
+else{
+  console.log('хуй')
+    return;
   }
 }
 
