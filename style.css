@@ -11,7 +11,7 @@
 
     --cell-size: 8vmin;
     --border-radius: 0.5vmin;
-    --gap: 0.5vmin;
+    --gap: 0.7vmin;
 
     --font-size: 3vmin;
 }
@@ -52,12 +52,12 @@ body {
     gap: var(--gap);
   }
   .cell-content {
-    display: flex; /* Flexbox для выравнивания */
-    justify-content: center; /* Центрирование по горизонтали */
-    align-items: center; /* Центрирование по вертикали */
-    height: 100%; /* Занимает всю высоту родительского элемента (cell) */
-    width: 100%; /* Занимает всю ширину родительского элемента (cell) */
-    position: relative; /*  Важно для абсолютного позиционирования cellsum */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    position: relative;
   }
   
   .cell {
@@ -167,18 +167,9 @@ body {
     margin-right: 50px;
 }
 
-.cell.dotted-border {
-    position: relative; /* Важно для позиционирования псевдоэлемента */
+  .cell.dotted-border{
+    border-top: 6px dashed #000;
+    border-right: 6px dashed #000;
+    border-bottom: 6px dashed #000;
+    border-left: 6px dashed #000;
   }
-
-.cell.dotted-border::before {
-    content: '';
-    position: absolute;
-    width: 80%;
-    height: 80%;
-    border-top: 3px dashed #000; /*  Цвет линии (черный в этом случае) */
-    border-right: 3px dashed #000; /*  Цвет линии (черный в этом случае) */
-    border-bottom: 3px dashed #000; /*  Цвет линии (черный в этом случае) */
-    border-left: 3px dashed #000; /*  Цвет линии (черный в этом случае) */
-}
-

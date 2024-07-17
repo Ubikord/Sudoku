@@ -3,16 +3,8 @@ import { Sudoku } from "./sudoku.js";
 const sudoku = new Sudoku();
 const storedSudokuToCompare = JSON.parse(localStorage.getItem('sudokuToCompare'));
 console.table(storedSudokuToCompare);
+
 let errors = 0;
-
-const groupArray = new Array(GRID_SIZE * GRID_SIZE).fill(0); //  Одномерный массив 
-
-const groupedArray = []; //  Пустой массив для двумерного представления
-for (let i = 0; i < GRID_SIZE; i++) {
-  groupedArray.push(groupArray.slice(i * GRID_SIZE, (i + 1) * GRID_SIZE)); 
-}
-
-
 let cells;
 let cellsSum;
 let selectedCellIndex;
@@ -21,9 +13,9 @@ init();
 
 function init() {
   initCells();
-  const difficulty = localStorage.getItem('difficulty'); // Получаем уровень сложности
-     if (difficulty === '70') { // Если это уровень Killer Sudoku
-       initCellsSum(); // Инициализируем клетки для суммы
+  const difficulty = localStorage.getItem('difficulty');
+     if (difficulty === '60') {
+       initCellsSum();
      }
   initNumbers();
   initRemover();
@@ -39,11 +31,8 @@ function initCells() {
 
 function initCellsSum() {
   cellsSum = document.querySelectorAll('.cellsum');
-  console.log(cellsSum)
   let i = 0;
   fillCellsSum(i);
-  //ColorCells();
-  console.log(cellsSum)
 }
 
 function fillCells() {
@@ -60,35 +49,13 @@ function fillCells() {
 
 function fillCellsSum(i){
   for (i; i < GRID_SIZE * GRID_SIZE; i++) {
-    const { row, column } = convertIndexToPosition(i);
-    console.log(cellsSum[i].classList.contains('ingroup', 'notingroup'), 'index = ', i)
     if (cellsSum[i].classList.contains('ingroup', 'notingroup')){
       return fillCellsSum(++i);
     }
     let cellsInGroup = getRandomInt(2);
-    let cellGroups = [];
-    console.log ('#', cellsInGroup)
-    //const { row, column } = convertIndexToPosition(index);
+    let cellGroups = new Set();
     joinGroup(cellsInGroup, i, cellGroups);
       calculateAndAssignSums(cellGroups)
-  }
-}
-function ColorCells(){
-  //console.log(cellsSum)
-  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-    const { row, column } = convertIndexToPosition(i);
-    console.log(i)
-    if (groupedArray[row][column] == 1 ){
-      console.log('cellsSum = ',cellsSum[i])
-      
-      cellsSum[i].classList.add('ingroup');
-      cellsSum[i].style.backgroundColor = 'red';
-    }
-    else {
-      console.log('cellsSum = ',cellsSum[i])
-    cellsSum[i].classList.add('notingroup');
-    cellsSum[i].style.backgroundColor = 'blue';
-    }
   }
 }
 
@@ -99,7 +66,6 @@ function getRandomInt(max) {
 function joinGroup(cellsInGroup, index, cellGroups){
   let newindex;
   const { row, column } = convertIndexToPosition(index);
-  console.log(row, column)
   const directions = [
     [row - 1, column], // вверх
     [row + 1, column], // вниз
@@ -118,15 +84,7 @@ function joinGroup(cellsInGroup, index, cellGroups){
     }
     [newRow, newCol] = directions[randomDirection];
 
-    console.log('R C',newRow, newCol)
-
     newindex = convertPositionToIndex(newRow, newCol);
-
-   console.log('newindex = ', newindex)
-   //console.log('cellsSum = ',cellsSum[newindex])
-   console.log(newRow < 0 || newRow >= GRID_SIZE || newCol < 0 || newCol >= GRID_SIZE 
-    || cellsSum[newindex].classList.contains('ingroup') || cellsSum[newindex].classList.contains('notingroup'))
-
 
     if (newRow < 0 || newRow >= GRID_SIZE || newCol < 0 || newCol >= GRID_SIZE 
       || cellsSum[newindex].classList.contains('ingroup') || cellsSum[newindex].classList.contains('notingroup')) {
@@ -137,51 +95,71 @@ function joinGroup(cellsInGroup, index, cellGroups){
       break;
     }
   } while (!directions.every(dir => dir === null));       
-  console.log('found = ',foundDirection)
-  console.log(cellGroups, ' - 1')
   if (foundDirection) {
     cellsSum[index].classList.add('ingroup');
     cellsSum[newindex].classList.add('ingroup');
     if (!cellGroups[index]) {
-      cellGroups[index] = index; //  Создаем группу, если ее нет
-      cellGroups[newindex] = newindex;
+      cellGroups.add(index);
+      cellGroups.add(newindex);
     } else {
-      cellGroups[newindex] = newindex;
+      cellGroups.add(newindex);
     }
-    console.log(cellGroups, ' - 2')
     return joinGroup(--cellsInGroup,newindex, cellGroups);
   } else if (!cellsSum[index].classList.contains('ingroup')){
     cellsSum[index].classList.add('notingroup');
   } 
 }
 else{
-  console.log('хуй')
     return;
+  }
+}
+
+function applyBorderStyles(a, b) {
+  if (cells[a] && cells[b]) {
+    switch (a - b) {
+      case -1:
+        cells[a].style.borderRight = '0';
+        cells[b].style.borderLeft = '0';
+        break;
+      case 1:
+        cells[a].style.borderLeft = '0';
+        cells[b].style.borderRight = '0';
+        break;
+      case -9:
+        cells[a].style.borderBottom = '0';
+        cells[b].style.borderTop = '0';
+        break;
+      case 9:
+        cells[a].style.borderTop = '0';
+        cells[b].style.borderBottom = '0';
+        break;
+    }
   }
 }
 
 function calculateAndAssignSums(cellGroups) {
   let sum = 0;
-
-  for (let i = 0; i < cellGroups.length; i++) {
-    if (cellGroups[i] !== undefined) { // Проверяем, что индекс существует
-      //sum = 0; // Сбрасываем сумму для каждой новой группы
-      const groupIndex = cellGroups[i]; // Получаем индекс для текущей группы
-      const { row, column } = convertIndexToPosition(groupIndex);
-      sum += storedSudokuToCompare[row][column]; // Считаем сумму для первой клетки
-    }
+  let a = null,
+    b = null;
+  for (const groupIndex of cellGroups) {
+    const { row, column } = convertIndexToPosition(groupIndex);
+    sum += storedSudokuToCompare[row][column];
   }
-      //  Применяем сумму к каждой клетке в группе
-      for (let i = 0; i < cellGroups.length; i++) {
-        if (cellGroups[i] !== undefined) {
-          cellsSum[cellGroups[i]].innerHTML = sum;
-          cells[cellGroups[i]].classList.add('dotted-border');
-          //cellsSum[cellGroups[i]].style.backgroundColor = 'red';
-    }
-    for (let i = 0; i < cellGroups.length; i++) {
-      if (cellGroups[i] !== undefined) {
 
-      }
+  for (const groupIndex of cellGroups) {
+    cellsSum[groupIndex].innerHTML = sum;
+    cells[groupIndex].classList.add('dotted-border');
+  }
+
+  for (const groupIndex of cellGroups) {
+    if (a == null) {
+      a = groupIndex;
+      continue;
+    } else if (b == null) {
+      b = groupIndex;
+      applyBorderStyles(a, b);
+      a = b;
+      b = null;
     }
   }
 }
@@ -291,13 +269,13 @@ function updateGameResult() {
   const gameOverMessage = document.getElementById("gameOver");
   errors++;
   if (errors >= 3) {
-    gameOverMessage.style.display = "block"; // Показать сообщение
-    gameOverMessage.style.position = "fixed"; // Зафиксировать на экране
+    gameOverMessage.style.display = "block";
+    gameOverMessage.style.position = "fixed";
     gameOverMessage.style.top = "0";
     gameOverMessage.style.left = "0";
     gameOverMessage.style.width = "100%";
     gameOverMessage.style.height = "100%";
-    gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.5)"; // Непрозрачный фон
+    gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
     gameOverMessage.style.color = "white";
     gameOverMessage.style.textAlign = "center";
     gameOverMessage.style.fontSize = "3em";
